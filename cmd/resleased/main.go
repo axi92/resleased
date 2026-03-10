@@ -14,6 +14,9 @@ import (
 	"resleased/internal/store"
 )
 
+var version = "dev" // overridden by -ldflags at build time
+var commit_sha = "dev"
+
 func main() {
 	addr := flag.String("addr", ":8080", "listen address")
 	stateFile := flag.String("state", "resleased.json", "path to state persistence file")
@@ -23,6 +26,8 @@ func main() {
 	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelInfo,
 	})))
+
+	slog.Info("starting resleased", "version", version, "commit", commit_sha)
 
 	s, err := store.New(*stateFile)
 	if err != nil {
