@@ -175,6 +175,26 @@ Example `resleased.json`:
 
 ---
 
+## Compose
+
+```yaml
+services:
+  resleased:
+    image: axi92/resleased:latest
+    container_name: resleased
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/data
+    #command:
+    #  - -addr=:8080
+    #  - -state=/data/state.json
+    #  - -purge-interval=5m
+```
+
+---
+
 ## Systemd unit
 
 ```ini
