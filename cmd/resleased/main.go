@@ -17,6 +17,13 @@ import (
 var version = "dev" // overridden by -ldflags at build time
 var commit_sha = "dev"
 
+// @title					resleased
+// @version				VERSION_PLACEHOLDER
+// @description		A lightweight HTTP service for exclusive, time-bounded resource reservations.
+// @license.name	AGPL-3.0
+// @license.url		https://www.gnu.org/licenses/agpl-3.0.html
+// @host					localhost:8080
+// @BasePath			/
 func main() {
 	addr := flag.String("addr", ":8080", "listen address")
 	stateFile := flag.String("state", "resleased.json", "path to state persistence file")

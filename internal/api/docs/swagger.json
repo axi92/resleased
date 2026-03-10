@@ -1,0 +1,340 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "A lightweight HTTP service for exclusive, time-bounded resource reservations.",
+        "title": "resleased",
+        "contact": {},
+        "license": {
+            "name": "AGPL-3.0",
+            "url": "https://www.gnu.org/licenses/agpl-3.0.html"
+        },
+        "version": "0.0.2"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/api/v1/extend": {
+            "post": {
+                "description": "Extends the expiry of an existing reservation by the specified duration.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "reservations"
+                ],
+                "summary": "Extend a reservation",
+                "parameters": [
+                    {
+                        "description": "Extend request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.ExtendRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.ExtendResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/openapi.json": {
+            "get": {
+                "description": "Returns the OpenAPI 3.0 specification for this API.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "meta"
+                ],
+                "summary": "OpenAPI specification",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/v1/release": {
+            "delete": {
+                "description": "Releases an existing reservation immediately, making the resource available to others.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "reservations"
+                ],
+                "summary": "Release a reservation",
+                "parameters": [
+                    {
+                        "description": "Release request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.ReleaseRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.ReleaseResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/reserve": {
+            "post": {
+                "description": "Attempts to acquire an exclusive lease on a resource for the specified duration.\nIf the resource is already reserved, returns HTTP 503 with the current owner and remaining time.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "reservations"
+                ],
+                "summary": "Reserve a resource",
+                "parameters": [
+                    {
+                        "description": "Reserve request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.ReserveRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.ReserveResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/api.LockedResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/status/{resource_id}": {
+            "get": {
+                "description": "Returns whether a resource is currently available or reserved.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "resources"
+                ],
+                "summary": "Get resource status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "X1",
+                        "description": "Resource ID",
+                        "name": "resource_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.StatusLockedResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "api.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "token is required"
+                }
+            }
+        },
+        "api.ExtendRequest": {
+            "type": "object",
+            "properties": {
+                "duration": {
+                    "type": "string",
+                    "example": "1h"
+                },
+                "token": {
+                    "type": "string",
+                    "example": "a3f9c1d2e4b5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3"
+                }
+            }
+        },
+        "api.ExtendResponse": {
+            "type": "object",
+            "properties": {
+                "expires_at": {
+                    "type": "string",
+                    "example": "2026-03-10T16:04:05Z"
+                }
+            }
+        },
+        "api.LockedResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "resource locked"
+                },
+                "owner": {
+                    "type": "string",
+                    "example": "ci-job-17"
+                },
+                "remaining_seconds": {
+                    "type": "integer",
+                    "example": 3547
+                },
+                "reserved_until": {
+                    "type": "string",
+                    "example": "2026-03-10T14:00:00Z"
+                }
+            }
+        },
+        "api.ReleaseRequest": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string",
+                    "example": "a3f9c1d2e4b5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3"
+                }
+            }
+        },
+        "api.ReleaseResponse": {
+            "type": "object",
+            "properties": {
+                "released": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "api.ReserveRequest": {
+            "type": "object",
+            "properties": {
+                "duration": {
+                    "type": "string",
+                    "example": "2h"
+                },
+                "owner": {
+                    "type": "string",
+                    "example": "ci-job-42"
+                },
+                "resource_id": {
+                    "type": "string",
+                    "example": "X1"
+                }
+            }
+        },
+        "api.ReserveResponse": {
+            "type": "object",
+            "properties": {
+                "expires_at": {
+                    "type": "string",
+                    "example": "2026-03-10T15:04:05Z"
+                },
+                "token": {
+                    "type": "string",
+                    "example": "a3f9c1d2e4b5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3"
+                }
+            }
+        },
+        "api.StatusAvailableResponse": {
+            "type": "object",
+            "properties": {
+                "available": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "api.StatusLockedResponse": {
+            "type": "object",
+            "properties": {
+                "available": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "owner": {
+                    "type": "string",
+                    "example": "ci-job-42"
+                },
+                "remaining_seconds": {
+                    "type": "integer",
+                    "example": 3547
+                },
+                "reserved_until": {
+                    "type": "string",
+                    "example": "2026-03-10T15:04:05Z"
+                }
+            }
+        }
+    }
+}

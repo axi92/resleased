@@ -19,6 +19,9 @@ that can only be used by one job at a time.
 ## Build & Run
 
 ```bash
+# Generate openapi docs
+go run github.com/swaggo/swag/cmd/swag@latest init -g cmd/resleased/main.go -o docs/
+
 go build -o resleased ./cmd/resleased
 
 # defaults: listen :8080, state file ./resleased.json
