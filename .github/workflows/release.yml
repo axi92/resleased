@@ -95,3 +95,5 @@ jobs:
             --notes-file release_notes.md \
             --latest \
             dist/*
+        env:
+          GH_TOKEN: ${{ github.token }}
