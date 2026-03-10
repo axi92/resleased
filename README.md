@@ -20,7 +20,7 @@ that can only be used by one job at a time.
 
 ```bash
 # Generate openapi docs
-go run github.com/swaggo/swag/cmd/swag@latest init -g cmd/resleased/main.go -o docs/
+go run github.com/swaggo/swag/cmd/swag@latest init -g cmd/resleased/main.go -o internal/api/docs/
 
 go build -o resleased ./cmd/resleased
 
