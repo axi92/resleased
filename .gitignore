@@ -1,3 +1,5 @@
 resleased
 resleased.json
 coverage.out
+internal/api/docs/docs.go
+internal/api/docs/swagger.yaml
