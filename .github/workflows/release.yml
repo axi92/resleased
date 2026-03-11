@@ -10,68 +10,9 @@ permissions:
 
 jobs:
   build:
-    name: Build ${{ matrix.goos }}/${{ matrix.goarch }}
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        include:
-          - goos: linux
-            goarch: amd64
-            suffix: ""
-          - goos: linux
-            goarch: arm64
-            suffix: ""
-          - goos: windows
-            goarch: amd64
-            suffix: ".exe"
-          - goos: darwin
-            goarch: amd64
-            suffix: ""
-          - goos: darwin
-            goarch: arm64
-            suffix: ""
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          fetch-depth: 0  # needed for release notes generation
-
-      - name: Set up Go
-        uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
-        with:
-          go-version-file: go.mod
-          cache: true
-
-      - name: Build
-        env:
-          GOOS: ${{ matrix.goos }}
-          GOARCH: ${{ matrix.goarch }}
-          CGO_ENABLED: 0
-        run: |
-          BINARY_NAME="resleased-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.suffix }}"
-          # generate openapi docs
-          go run github.com/swaggo/swag/cmd/swag@latest init \
-            -g cmd/resleased/main.go \
-            -o internal/api/docs/
-
-          # Replace version in openapi docs
-          sed -i 's/"version": "VERSION_PLACEHOLDER"/"version": "${{ github.ref_name }}"/' \
-            internal/api/docs/swagger.json
-
-          go build \
-            -trimpath \
-            -ldflags="-s -w -X main.version=${{ github.ref_name }} -X main.commit_sha=${{ github.sha }}" \
-            -o "${BINARY_NAME}" \
-            ./cmd/resleased
-          echo "BINARY_NAME=${BINARY_NAME}" >> $GITHUB_ENV
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
-        with:
-          name: ${{ env.BINARY_NAME }}
-          path: ${{ env.BINARY_NAME }}
-          retention-days: 1
+    uses: ./.github/workflows/build.yml
+    with:
+      ref_name: ${{ github.ref_name }}
 
   docker:
     name: Build & Push Docker Image
