@@ -8,7 +8,7 @@
             "name": "AGPL-3.0",
             "url": "https://www.gnu.org/licenses/agpl-3.0.html"
         },
-        "version": "0.0.2"
+        "version": "VERSION_PLACEHOLDER"
     },
     "host": "localhost:8080",
     "basePath": "/",

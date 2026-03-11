@@ -1,4 +1,4 @@
-name: Build
+name: ci
 
 on:
   push:
@@ -57,7 +57,7 @@ jobs:
           go run github.com/swaggo/swag/cmd/swag@latest init \
             -g cmd/resleased/main.go \
             -o internal/api/docs/
-          sed -i 's/"version": "VERSION_PLACEHOLDER"/"version": "${{ github.ref_name }}"/' \
+          sed -i 's|"version": "VERSION_PLACEHOLDER"|"version": "${{ github.ref_name }}"|' \
             internal/api/docs/swagger.json
 
       - name: Build
