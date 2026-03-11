@@ -43,6 +43,14 @@ jobs:
           go-version-file: go.mod
           cache: true
 
+      - name: Generate swagger docs
+        run: |
+          go run github.com/swaggo/swag/cmd/swag@latest init \
+            -g cmd/resleased/main.go \
+            -o internal/api/docs/
+          sed -i 's/"version": "VERSION_PLACEHOLDER"/"version": "${{ github.ref_name }}"/' \
+            internal/api/docs/swagger.json
+
       - name: Build
         env:
           GOOS: ${{ matrix.goos }}
@@ -50,15 +58,6 @@ jobs:
           CGO_ENABLED: 0
         run: |
           BINARY_NAME="resleased-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.suffix }}"
-          # generate openapi docs
-          go run github.com/swaggo/swag/cmd/swag@latest init \
-            -g cmd/resleased/main.go \
-            -o internal/api/docs/
-
-          # Replace version in openapi docs
-          sed -i 's/"version": "VERSION_PLACEHOLDER"/"version": "${{ github.ref_name }}"/' \
-            internal/api/docs/swagger.json
-
           go build \
             -trimpath \
             -ldflags="-s -w -X main.version=${{ github.ref_name }} -X main.commit_sha=${{ github.sha }}" \
