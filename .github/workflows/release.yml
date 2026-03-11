@@ -96,6 +96,6 @@ jobs:
             --title "${{ github.ref_name }}" \
             --notes-file release_notes.md \
             --latest \
-            dist/*
+            dist/resleased-*
         env:
           GH_TOKEN: ${{ github.token }}
